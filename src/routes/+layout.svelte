@@ -12,7 +12,10 @@
 <main class="min-h-screen bg-base-300">
 	<div class="navbar bg-base-100">
 		<a href="/" class="btn text-xl btn-ghost">UBC Workday2Cal</a>
-		<a href="https://github.com/jackkoskie/ubc-workday2cal" class="ms-auto">GitHub</a>
+		<div class="ms-auto me-5 flex flex-row gap-3">
+			<a href="https://github.com/jackkoskie/ubc-workday2cal" class="ms-auto">GitHub</a>
+			<a href="/privacy">Privacy</a>
+		</div>
 	</div>
 
 	{@render children?.()}

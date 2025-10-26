@@ -11,6 +11,9 @@ importers:
       ical-generator:
         specifier: ^9.0.0
         version: 9.0.0(@types/luxon@3.7.1)(@types/node@22.18.12)(luxon@3.7.2)
+      lucide-svelte:
+        specifier: ^0.548.0
+        version: 0.548.0(svelte@5.42.2)
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
@@ -1506,6 +1509,11 @@ packages:
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+
+  lucide-svelte@0.548.0:
+    resolution: {integrity: sha512-aW2BfHWBLWf/XPSKytTPV16AWfFeFIJeUyOg7eHY2rhzVQ0u0LIvoS4pm2oskr+OJVw+NsS8fPvlBVqPfUO1XQ==}
+    peerDependencies:
+      svelte: ^3 || ^4 || ^5.0.0-next.42
 
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
@@ -3152,6 +3160,10 @@ snapshots:
       p-locate: 5.0.0
 
   lodash.merge@4.6.2: {}
+
+  lucide-svelte@0.548.0(svelte@5.42.2):
+    dependencies:
+      svelte: 5.42.2
 
   luxon@3.7.2: {}
 

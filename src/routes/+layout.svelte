@@ -10,8 +10,9 @@
 </svelte:head>
 
 <main class="min-h-screen bg-base-300">
-	<div class="navbar bg-base-100 shadow-sm">
+	<div class="navbar bg-base-100">
 		<a href="/" class="btn text-xl btn-ghost">UBC Workday2Cal</a>
+		<a href="https://github.com/jackkoskie/ubc-workday2cal" class="ms-auto">GitHub</a>
 	</div>
 
 	{@render children?.()}

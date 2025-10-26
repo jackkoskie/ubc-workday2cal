@@ -36,10 +36,9 @@ export const actions = {
 		try {
 			// Convert File to ArrayBuffer
 			const arrayBuffer = await file.arrayBuffer();
-			const buffer = Buffer.from(arrayBuffer);
 
-			// Read workbook
-			const workbook = xlsx.read(buffer, { type: 'buffer' });
+			// Read workbook - xlsx can read ArrayBuffer directly
+			const workbook = xlsx.read(arrayBuffer, { type: 'array' });
 			const sheet = workbook.Sheets[SHEET_NAME];
 
 			if (!sheet) {

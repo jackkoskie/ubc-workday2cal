@@ -26,12 +26,18 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^6.2.0
         version: 6.2.1(svelte@5.42.2)(vite@7.1.12(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.2))
+      '@tailwindcss/typography':
+        specifier: ^0.5.18
+        version: 0.5.19(tailwindcss@4.1.16)
       '@tailwindcss/vite':
         specifier: ^4.1.13
         version: 4.1.16(vite@7.1.12(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.2))
       '@types/node':
         specifier: ^22
         version: 22.18.12
+      daisyui:
+        specifier: ^5.3.10
+        version: 5.3.10
       eslint:
         specifier: ^9.36.0
         version: 9.38.0(jiti@2.6.1)
@@ -896,6 +902,11 @@ packages:
     resolution: {integrity: sha512-2OSv52FRuhdlgyOQqgtQHuCgXnS8nFSYRp2tJ+4WZXKgTxqPy7SMSls8c3mPT5pkZ17SBToGM5LHEJBO7miEdg==}
     engines: {node: '>= 10'}
 
+  '@tailwindcss/typography@0.5.19':
+    resolution: {integrity: sha512-w31dd8HOx3k9vPtcQh5QHP9GwKcgbMp87j58qi6xgiBnFFtKEAgCWnDw4qUT8aHwkCp8bKvb/KGKWWHedP0AAg==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
+
   '@tailwindcss/vite@4.1.16':
     resolution: {integrity: sha512-bbguNBcDxsRmi9nnlWJxhfDWamY3lmcyACHcdO1crxfzuLpOhHLLtEIN/nCbbAtj5rchUgQD17QVAKi1f7IsKg==}
     peerDependencies:
@@ -1074,6 +1085,9 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
+
+  daisyui@5.3.10:
+    resolution: {integrity: sha512-vmjyPmm0hvFhA95KB6uiGmWakziB2pBv6CUcs5Ka/3iMBMn9S+C3SZYx9G9l2JrgTZ1EFn61F/HrPcwaUm2kLQ==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -1537,6 +1551,10 @@ packages:
     engines: {node: '>=12.0'}
     peerDependencies:
       postcss: ^8.4.29
+
+  postcss-selector-parser@6.0.10:
+    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+    engines: {node: '>=4'}
 
   postcss-selector-parser@7.1.0:
     resolution: {integrity: sha512-8sLjZwK0R+JlxlYcTuVnyT2v+htpdrjDOKuMcOVdYjt52Lh8hWRYpxBPoKx/Zg+bcjc3wx6fmQevMmUztS/ccA==}
@@ -2463,6 +2481,11 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.16
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.16
 
+  '@tailwindcss/typography@0.5.19(tailwindcss@4.1.16)':
+    dependencies:
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 4.1.16
+
   '@tailwindcss/vite@4.1.16(vite@7.1.12(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.2))':
     dependencies:
       '@tailwindcss/node': 4.1.16
@@ -2659,6 +2682,8 @@ snapshots:
       which: 2.0.2
 
   cssesc@3.0.0: {}
+
+  daisyui@5.3.10: {}
 
   debug@4.4.3:
     dependencies:
@@ -3116,6 +3141,11 @@ snapshots:
   postcss-scss@4.0.9(postcss@8.5.6):
     dependencies:
       postcss: 8.5.6
+
+  postcss-selector-parser@6.0.10:
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
 
   postcss-selector-parser@7.1.0:
     dependencies:

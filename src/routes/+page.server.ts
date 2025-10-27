@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import * as xlsx from 'xlsx';
-import ical from 'ical-generator';
+import ical, { ICalEventRepeatingFreq, ICalWeekday } from 'ical-generator';
 import { DateTime } from 'luxon';
 
 export const load = (async () => {
@@ -72,9 +72,10 @@ export const actions = {
 			// Create calendar
 			const resultCal = ical({ name: 'UBC Schedule' });
 
-			// Enhanced regex to handle various pattern formats including alternate weeks
+			// Enhanced regex to handle various pattern formats including alternate weeks and location
+			// Captures: dates, days, times, and optionally building and room info
 			const mpRegex =
-				/(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})\s*\|\s*([\w\s()]+?)\s*\|\s*([\d:]+)\s*-\s*([\d:]+)/gi;
+				/(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})\s*\|\s*([\w\s()]+?)\s*\|\s*([\d:]+)\s*-\s*([\d:]+)(?:\s*\|\s*[^|]*\|\s*([^|]+?)\s*\|\s*Floor:\s*\d+\s*\|\s*Room:\s*(\d+))?/gi;
 
 			let eventsCreated = 0;
 			let rowsProcessed = 0;
@@ -99,12 +100,20 @@ export const actions = {
 				let match;
 
 				while ((match = mpRegex.exec(String(pattern))) !== null) {
-					const [, mpStartStr, mpEndStr, daysStr, startTimeStr, endTimeStr] = match;
+					const [, mpStartStr, mpEndStr, daysStr, startTimeStr, endTimeStr, building, room] = match;
 
 					const mpStart = DateTime.fromISO(mpStartStr, { zone: TIMEZONE });
 					const mpEnd = DateTime.fromISO(mpEndStr, { zone: TIMEZONE });
 					if (!mpStart.isValid || !mpEnd.isValid) {
 						continue;
+					}
+
+					// Build location string from building and room if available
+					let locationStr = 'UBC Okanagan';
+					if (building && room) {
+						// Clean up building name - remove parenthetical abbreviations like "(ART)"
+						const cleanBuilding = building.replace(/\s*\([^)]*\)\s*$/, '').trim();
+						locationStr = `${cleanBuilding} Room ${room}`;
 					}
 
 					// Extract weekday names from the daysStr
@@ -118,66 +127,74 @@ export const actions = {
 					// Detect if this is an alternate weeks pattern
 					const isAlternateWeeks = /\(Alternate\s+weeks?\)/i.test(daysStr);
 
-					// For each weekday in the pattern, iterate from mpStart to mpEnd and create events
+					// Create one recurring event for each unique day of the week
 					for (const day of days) {
 						const weekday = weekdayMap[day];
 						if (!weekday) continue;
 
+						// Find the first occurrence of this weekday in the pattern
 						let cursor = mpStart.startOf('day');
-						const endCursor = mpEnd.startOf('day');
-
-						// Find the first occurrence of this weekday
-						while (cursor <= endCursor && cursor.weekday !== weekday) {
+						while (cursor <= mpEnd && cursor.weekday !== weekday) {
 							cursor = cursor.plus({ days: 1 });
 						}
 
-						// Now iterate through all matching weekdays
-						while (cursor <= endCursor) {
-							if (cursor.weekday === weekday) {
-								// Parse time - try 24-hour format first
-								let startDT = DateTime.fromFormat(
-									`${cursor.toISODate()} ${startTimeStr}`,
-									'yyyy-MM-dd H:mm',
-									{ zone: TIMEZONE }
-								);
-								let endDT = DateTime.fromFormat(
-									`${cursor.toISODate()} ${endTimeStr}`,
-									'yyyy-MM-dd H:mm',
-									{ zone: TIMEZONE }
-								);
+						if (cursor > mpEnd) continue; // No occurrence found
 
-								// If that fails, try 12-hour format with AM/PM
-								if (!startDT.isValid || !endDT.isValid) {
-									startDT = DateTime.fromFormat(
-										`${cursor.toISODate()} ${startTimeStr}`,
-										'yyyy-MM-dd h:mm a',
-										{ zone: TIMEZONE }
-									);
-									endDT = DateTime.fromFormat(
-										`${cursor.toISODate()} ${endTimeStr}`,
-										'yyyy-MM-dd h:mm a',
-										{ zone: TIMEZONE }
-									);
+						// Parse time for the first occurrence - try 24-hour format first
+						let startDT = DateTime.fromFormat(
+							`${cursor.toISODate()} ${startTimeStr}`,
+							'yyyy-MM-dd H:mm',
+							{ zone: TIMEZONE }
+						);
+						let endDT = DateTime.fromFormat(
+							`${cursor.toISODate()} ${endTimeStr}`,
+							'yyyy-MM-dd H:mm',
+							{ zone: TIMEZONE }
+						);
+
+						// If that fails, try 12-hour format with AM/PM
+						if (!startDT.isValid || !endDT.isValid) {
+							startDT = DateTime.fromFormat(
+								`${cursor.toISODate()} ${startTimeStr}`,
+								'yyyy-MM-dd h:mm a',
+								{ zone: TIMEZONE }
+							);
+							endDT = DateTime.fromFormat(
+								`${cursor.toISODate()} ${endTimeStr}`,
+								'yyyy-MM-dd h:mm a',
+								{ zone: TIMEZONE }
+							);
+						}
+
+						if (startDT.isValid && endDT.isValid) {
+							// Map luxon weekday (1=Mon) to iCal weekday
+							const dayMap: Record<number, ICalWeekday> = {
+								1: ICalWeekday.MO,
+								2: ICalWeekday.TU,
+								3: ICalWeekday.WE,
+								4: ICalWeekday.TH,
+								5: ICalWeekday.FR,
+								6: ICalWeekday.SA,
+								7: ICalWeekday.SU
+							};
+
+							// Create recurring event
+							resultCal.createEvent({
+								start: startDT.toJSDate(),
+								end: endDT.toJSDate(),
+								summary: String(courseName),
+								description: `${courseName} (${formatType ?? ''})${
+									isAlternateWeeks ? ' - Alternate Weeks' : ''
+								}`,
+								location: locationStr,
+								repeating: {
+									freq: ICalEventRepeatingFreq.WEEKLY,
+									interval: isAlternateWeeks ? 2 : 1,
+									byDay: [dayMap[weekday]],
+									until: mpEnd.endOf('day').toJSDate()
 								}
-
-								if (startDT.isValid && endDT.isValid) {
-									resultCal.createEvent({
-										start: startDT.toJSDate(),
-										end: endDT.toJSDate(),
-										summary: String(courseName),
-										description: `${courseName} (${formatType ?? ''})${
-											isAlternateWeeks ? ' - Alternate Weeks' : ''
-										}`,
-										location: 'UBC Okanagan'
-									});
-									eventsCreated++;
-								}
-
-								// For alternate weeks, skip a week
-								cursor = cursor.plus({ days: isAlternateWeeks ? 14 : 7 });
-							} else {
-								cursor = cursor.plus({ days: 1 });
-							}
+							});
+							eventsCreated++;
 						}
 					}
 				}

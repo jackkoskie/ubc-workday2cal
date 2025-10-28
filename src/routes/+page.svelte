@@ -216,7 +216,7 @@
 		<div in:fly={{ y: 20, duration: 500 }}>
 			<p>
 				This website's open sourced! Found a bug, have an idea for a great new feature? <a
-					href="https://github.com/jackkoskie/ubc-workday2cal/issues/new">Submit and issue</a
+					href="https://github.com/jackkoskie/ubc-workday2cal/issues/new">Submit an issue</a
 				>
 				on our github. Have some coding knowledge and want to contribute,
 				<a href="https://github.com/jackkoskie/ubc-workday2cal/pulls">submit a pull request</a>!

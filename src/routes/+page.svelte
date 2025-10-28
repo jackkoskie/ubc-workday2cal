@@ -4,13 +4,15 @@
 	import workdayExport from '$lib/assets/workdayExport.png';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { enhance } from '$app/forms';
-	import { fade, fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { CircleX, CircleCheck, Download } from 'lucide-svelte';
+	import { processWorkdayFile, type ProcessResult } from '$lib/processWorkdayFile';
 
 	let currentStep = $state(0);
+	let processingFile = $state(false);
+	let result = $state<ProcessResult | null>(null);
 
-	let { data, form }: PageProps = $props();
+	let { data }: PageProps = $props();
 
 	const setStep = (step: number) => {
 		currentStep = step;
@@ -36,31 +38,51 @@
 	onMount(() => {
 		let initialStep = 0;
 
-		if (form?.gotoStep !== undefined) {
-			initialStep = form.gotoStep;
-		} else {
-			const stepParam = page.url.searchParams.get('step');
-			if (stepParam !== null) {
-				const parsed = parseInt(stepParam, 10);
-				if (!isNaN(parsed)) {
-					initialStep = parsed;
-				}
+		const stepParam = page.url.searchParams.get('step');
+		if (stepParam !== null) {
+			const parsed = parseInt(stepParam, 10);
+			if (!isNaN(parsed)) {
+				initialStep = parsed;
 			}
 		}
 
 		setStep(initialStep);
 	});
 
-	// Watch for form changes (e.g., after form submission) and update step
-	$effect(() => {
-		if (form?.gotoStep !== undefined) {
-			setStep(form.gotoStep);
+	const handleFileSubmit = async (event: Event) => {
+		event.preventDefault();
+		const form = event.target as HTMLFormElement;
+		const fileInput = form.querySelector('input[type="file"]') as HTMLInputElement;
+		const file = fileInput?.files?.[0];
+
+		if (!file) {
+			result = { success: false, error: 'No file provided' };
+			return;
 		}
-	});
+
+		processingFile = true;
+		result = null;
+
+		try {
+			const processResult = await processWorkdayFile(file);
+			result = processResult;
+
+			if (processResult.success) {
+				setStep(3);
+			}
+		} catch (error) {
+			result = {
+				success: false,
+				error: `Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`
+			};
+		} finally {
+			processingFile = false;
+		}
+	};
 
 	const downloadICS = () => {
-		if (form?.icsContent) {
-			const blob = new Blob([form.icsContent], { type: 'text/calendar' });
+		if (result?.icsContent) {
+			const blob = new Blob([result.icsContent], { type: 'text/calendar' });
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
 			a.href = url;
@@ -119,33 +141,36 @@
 				Next, we now hand the file over to Workday2Cal to process, please upload your file below:
 			</p>
 
-			{#if form?.error}
+			{#if result?.error}
 				<div class="mb-4 alert alert-error">
 					<CircleX class="h-6 w-6 shrink-0 stroke-current" />
-					<span>{form.error}</span>
+					<span>{result.error}</span>
 				</div>
 			{/if}
 
-			<form
-				action="?/processFile"
-				method="post"
-				enctype="multipart/form-data"
-				class="flex flex-row gap-3"
-				use:enhance
-			>
-				<input type="file" class="file-input" name="file" required accept=".xlsx" />
-				<button class="btn btn-success">Submit</button>
+			<form onsubmit={handleFileSubmit} class="flex flex-row gap-3">
+				<input
+					type="file"
+					class="file-input"
+					name="file"
+					required
+					accept=".xlsx"
+					disabled={processingFile}
+				/>
+				<button class="btn btn-success" disabled={processingFile}>
+					{processingFile ? 'Processing...' : 'Submit'}
+				</button>
 			</form>
 		</div>
 	{/if}
 	{#if currentStep >= 3}
 		<div in:fly={{ y: 20, duration: 500 }} out:fly={{ y: -20, duration: 300 }}>
 			<h2 id="3">Step 3</h2>
-			{#if form?.success}
+			{#if result?.success}
 				<div class="mb-4 alert alert-success">
 					<CircleCheck class="h-6 w-6 shrink-0 stroke-current" />
 					<span
-						>Successfully created {form.eventsCreated} events from {form.rowsProcessed} rows!</span
+						>Successfully created {result.eventsCreated} events from {result.rowsProcessed} rows!</span
 					>
 				</div>
 

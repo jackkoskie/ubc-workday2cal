@@ -98,7 +98,7 @@
 	};
 </script>
 
-<section class="container mx-auto prose max-w-4xl px-2 py-3">
+<section class="container mx-auto prose max-w-4xl px-2 pt-3 pb-15">
 	<h1>Welcome to UBC Workday2Cal!</h1>
 	<p>
 		This tool allows you to easily take your courses from UBC's workday and add them to Google

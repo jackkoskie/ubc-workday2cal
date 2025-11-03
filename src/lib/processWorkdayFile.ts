@@ -174,7 +174,7 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 						resultCal.createEvent({
 							start: startDT.toJSDate(),
 							end: endDT.toJSDate(),
-							summary: String(courseName),
+							summary: `${courseName}${formatType ? ` (${formatType})` : ''}`,
 							description: `${courseName} (${formatType ?? ''})${
 								isAlternateWeeks ? ' - Alternate Weeks' : ''
 							}`,

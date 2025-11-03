@@ -61,8 +61,11 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 			header: 1
 		}) as unknown[][];
 
-		// Create calendar
-		const resultCal = ical({ name: 'UBC Schedule' });
+		// Create calendar with timezone to properly handle DST
+		const resultCal = ical({
+			name: 'UBC Schedule',
+			timezone: TIMEZONE
+		});
 
 		// Enhanced regex to handle various pattern formats including alternate weeks and location
 		// Captures: dates, days, times, and optionally building and room info
@@ -170,10 +173,10 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 							7: ICalWeekday.SU
 						};
 
-						// Create recurring event
+						// Create recurring event with Luxon DateTime objects to preserve timezone info
 						resultCal.createEvent({
-							start: startDT.toJSDate(),
-							end: endDT.toJSDate(),
+							start: startDT,
+							end: endDT,
 							summary: String(courseName),
 							description: `${courseName} (${formatType ?? ''})${
 								isAlternateWeeks ? ' - Alternate Weeks' : ''
@@ -183,7 +186,7 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 								freq: ICalEventRepeatingFreq.WEEKLY,
 								interval: isAlternateWeeks ? 2 : 1,
 								byDay: [dayMap[weekday]],
-								until: mpEnd.endOf('day').toJSDate()
+								until: mpEnd.endOf('day')
 							}
 						});
 						eventsCreated++;

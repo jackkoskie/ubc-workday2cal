@@ -158,10 +158,10 @@
 					name="file"
 					required
 					accept=".xlsx"
-					disabled={processingFile}
+					disabled={processingFile || currentStep !== 2}
 				/>
-				<button class="btn btn-success" disabled={processingFile}>
-					{processingFile ? 'Processing...' : 'Submit'}
+				<button class="btn btn-success" disabled={processingFile || currentStep !== 2}>
+					{processingFile ? 'Processing...' : currentStep !== 2 ? 'Processed' : 'Submit'}
 				</button>
 			</form>
 		</div>

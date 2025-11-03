@@ -82,6 +82,9 @@
 		This tool allows you to easily take your courses from UBC's workday and add them to Google
 		Calendar, Apple Calendar, or any other calendar software.
 	</p>
+	<p class="italic">
+		Note: This site is not affiliated with the University of British Columbia in any way.
+	</p>
 	{#if currentStep === 0}
 		<div in:fly={{ y: 20, duration: 500 }}>
 			<button class="btn btn-primary" onclick={() => setStep(1)}>Get Started</button>

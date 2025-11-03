@@ -7,31 +7,31 @@
 <article class="mx-auto prose max-w-4xl p-8 prose-slate">
 	<h1>Privacy Policy</h1>
 
-	<p class="text-gray-600 italic">Last updated: October 26, 2025</p>
+	<p class="text-gray-600 italic">Last updated: October 28, 2025</p>
 
 	<h2>Overview</h2>
 	<p>
-		This application is designed with your privacy in mind. While data may be transmitted to our
-		server for processing, we do not store or share any of your personal data.
+		This application is designed with your privacy in mind. All processing happens entirely in your
+		browser. No data is ever transmitted to any server.
 	</p>
 
 	<h2>Data Collection</h2>
 	<p>
-		We do not collect or retain any personal information or usage data. Your data is transmitted to
-		our server for processing purposes only and is immediately discarded after processing.
+		We do not collect or retain any personal information or usage data. All data processing occurs
+		locally in your browser and never leaves your device.
 	</p>
 
 	<h2>Data Storage</h2>
 	<p>
-		No data is stored on our servers. While your data is transmitted to the server for processing,
-		it is not saved, logged, or retained in any way. Once processing is complete, the data is
-		immediately discarded.
+		No data is stored on our servers because no data ever reaches our servers. All file processing
+		happens entirely within your browser, keeping your information completely on your device.
 	</p>
 
 	<h2>Data Sharing</h2>
 	<p>
-		Since we do not collect or store any data, we have nothing to share with third parties. Your
-		information stays completely private.
+		Since all processing happens locally in your browser and no data is transmitted anywhere, we
+		have nothing to share with third parties. Your information stays completely private and never
+		leaves your device.
 	</p>
 
 	<h2>Cookies and Tracking</h2>

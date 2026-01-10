@@ -43,7 +43,7 @@
 		"wrangler": "^4.45.0"
 	},
 	"dependencies": {
-		"ical-generator": "^9.0.0",
+		"ical-generator": "^10.0.0",
 		"lucide-svelte": "^0.562.0",
 		"luxon": "^3.7.2",
 		"xlsx": "^0.18.5"

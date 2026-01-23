@@ -12,8 +12,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.1)(@types/node@22.19.7)(luxon@3.7.2)
       lucide-svelte:
-        specifier: ^0.562.0
-        version: 0.562.0(svelte@5.48.0)
+        specifier: ^0.563.0
+        version: 0.563.0(svelte@5.48.0)
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
@@ -1500,8 +1500,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lucide-svelte@0.562.0:
-    resolution: {integrity: sha512-kSJDH/55lf0mun/o4nqWBXOcq0fWYzPeIjbTD97ywoeumAB9kWxtM06gC7oynqjtK3XhAljWSz5RafIzPEYIQA==}
+  lucide-svelte@0.563.0:
+    resolution: {integrity: sha512-pjZKw7TpQcamfQrx7YdbOHgmrcNeKiGGMD0tKZQaVktwSsbqw28CsKc2Q97ttwjytiCWkJyOa8ij2Q+Og0nPfQ==}
     peerDependencies:
       svelte: ^3 || ^4 || ^5.0.0-next.42
 
@@ -3072,7 +3072,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lucide-svelte@0.562.0(svelte@5.48.0):
+  lucide-svelte@0.563.0(svelte@5.48.0):
     dependencies:
       svelte: 5.48.0
 

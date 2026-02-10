@@ -162,6 +162,9 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 					}
 
 					if (startDT.isValid && endDT.isValid) {
+						// Subtract 10 minutes from end time as practiced by instructors
+						const adjustedEndDT = endDT.minus({ minutes: 10 });
+
 						// Map luxon weekday (1=Mon) to iCal weekday
 						const dayMap: Record<number, ICalWeekday> = {
 							1: ICalWeekday.MO,
@@ -176,7 +179,7 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 						// Create recurring event with Luxon DateTime objects to preserve timezone info
 						resultCal.createEvent({
 							start: startDT,
-							end: endDT,
+							end: adjustedEndDT,
 							summary: `${courseName}${formatType ? ` (${formatType})` : ''}`,
 							description: `${courseName} (${formatType ?? ''})${
 								isAlternateWeeks ? ' - Alternate Weeks' : ''

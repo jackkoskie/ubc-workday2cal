@@ -198,8 +198,7 @@
 					<strong>Apple Calendar:</strong> Double-click the downloaded file or go to File → Import
 				</li>
 				<li>
-					<strong>Outlook:</strong> Go to File → Open & Export → Import/Export → Import an iCalendar
-					file
+					<strong>Outlook:</strong> Go to File → Open & Export → Import/Export → Import an iCalendar file
 				</li>
 			</ul>
 

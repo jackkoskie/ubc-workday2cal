@@ -16,6 +16,47 @@ const weekdayMap: Record<string, number> = {
 const TIMEZONE = 'America/Vancouver';
 const SHEET_NAME = 'View My Courses';
 
+const HEADER_ALIASES = {
+	course: ['Course Listing', 'Course'],
+	format: ['Instructional Format', 'Format'],
+	meetingPatterns: ['Meeting Patterns', 'Meeting Pattern', 'Schedule']
+};
+
+const normalizeHeader = (value: unknown) =>
+	String(value ?? '')
+		.trim()
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+
+const normalizeTimeString = (value: string) =>
+	value.trim().replace(/\./g, '').replace(/\s+/g, ' ').toUpperCase();
+
+const findHeaderRow = (rows: unknown[][]) => {
+	for (let i = 0; i < rows.length; i++) {
+		const row = rows[i];
+		if (!row || row.length === 0) continue;
+		const normalizedRow = row.map((cell) => normalizeHeader(cell));
+		const headerMap: Record<string, number | undefined> = {};
+
+		Object.entries(HEADER_ALIASES).forEach(([key, aliases]) => {
+			for (let col = 0; col < normalizedRow.length; col++) {
+				if (aliases.map(normalizeHeader).includes(normalizedRow[col])) {
+					headerMap[key] = col;
+					break;
+				}
+			}
+		});
+
+		if (headerMap.course !== undefined && headerMap.meetingPatterns !== undefined) {
+			return { headerRowIndex: i, headerMap };
+		}
+	}
+
+	return null;
+};
+
 export interface ProcessResult {
 	success: boolean;
 	icsContent?: string;
@@ -31,35 +72,57 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 
 		// Read workbook - xlsx can read ArrayBuffer directly
 		const workbook = xlsx.read(arrayBuffer, { type: 'array' });
-		const sheet = workbook.Sheets[SHEET_NAME];
 
-		if (!sheet) {
+		const sheetsToCheck = workbook.SheetNames.map((name) => ({
+			name,
+			sheet: workbook.Sheets[name]
+		}));
+
+		let selectedRows: unknown[][] | null = null;
+		let headerInfo: {
+			headerRowIndex: number;
+			headerMap: Record<string, number | undefined>;
+		} | null = null;
+
+		for (const { sheet } of sheetsToCheck) {
+			if (!sheet) continue;
+
+			// Fix Excel !ref issue: Some Workday exports have incorrect !ref property
+			const cellAddresses = Object.keys(sheet).filter((key) => !key.startsWith('!'));
+			if (cellAddresses.length > 0) {
+				let maxRow = 0;
+				let maxCol = 0;
+				cellAddresses.forEach((addr) => {
+					const decoded = xlsx.utils.decode_cell(addr);
+					if (decoded.r > maxRow) maxRow = decoded.r;
+					if (decoded.c > maxCol) maxCol = decoded.c;
+				});
+				sheet['!ref'] = xlsx.utils.encode_range({
+					s: { r: 0, c: 0 },
+					e: { r: maxRow, c: maxCol }
+				});
+			}
+
+			const rows = xlsx.utils.sheet_to_json<string[]>(sheet, {
+				header: 1
+			}) as unknown[][];
+
+			const candidateHeader = findHeaderRow(rows);
+			if (candidateHeader) {
+				selectedRows = rows;
+				headerInfo = candidateHeader;
+				break;
+			}
+		}
+
+		if (!selectedRows || !headerInfo) {
 			return {
 				success: false,
-				error: `Sheet not found: ${SHEET_NAME}`
+				error: `Sheet not found or missing expected headers: ${SHEET_NAME}`
 			};
 		}
 
-		// Fix Excel !ref issue: Some Workday exports have incorrect !ref property
-		const cellAddresses = Object.keys(sheet).filter((key) => !key.startsWith('!'));
-		if (cellAddresses.length > 0) {
-			let maxRow = 0;
-			let maxCol = 0;
-			cellAddresses.forEach((addr) => {
-				const decoded = xlsx.utils.decode_cell(addr);
-				if (decoded.r > maxRow) maxRow = decoded.r;
-				if (decoded.c > maxCol) maxCol = decoded.c;
-			});
-			sheet['!ref'] = xlsx.utils.encode_range({
-				s: { r: 0, c: 0 },
-				e: { r: maxRow, c: maxCol }
-			});
-		}
-
-		// Read sheet as array of rows
-		const rows = xlsx.utils.sheet_to_json<string[]>(sheet, {
-			header: 1
-		}) as unknown[][];
+		const rows = selectedRows;
 
 		// Create calendar with timezone to properly handle DST
 		const resultCal = ical({
@@ -70,21 +133,26 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 		// Enhanced regex to handle various pattern formats including alternate weeks and location
 		// Captures: dates, days, times, and optionally building and room info
 		const mpRegex =
-			/(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})\s*\|\s*([\w\s()]+?)\s*\|\s*([\d:]+)\s*-\s*([\d:]+)(?:\s*\|\s*[^|]*\|\s*([^|]+?)\s*\|\s*Floor:\s*\d+\s*\|\s*Room:\s*(\d+))?/gi;
+			/(\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})\s*\|\s*([^|]+?)\s*\|\s*([0-9: ]+(?:[ap]\.??m\.?)?)\s*-\s*([0-9: ]+(?:[ap]\.??m\.?)?)(?:\s*\|\s*[^|]*\|\s*([^|]+?)\s*\|\s*Floor:\s*[^|]+\s*\|\s*Room:\s*([A-Za-z0-9-]+))?/gi;
 
 		let eventsCreated = 0;
 		let rowsProcessed = 0;
 
-		// Start from row 3 (index 3) to skip header rows
-		for (let i = 3; i < rows.length; i++) {
+		const { headerRowIndex, headerMap } = headerInfo;
+		const courseCol = headerMap.course ?? -1;
+		const formatCol = headerMap.format ?? -1;
+		const meetingCol = headerMap.meetingPatterns ?? -1;
+
+		// Start after detected header row to skip title/header rows
+		for (let i = headerRowIndex + 1; i < rows.length; i++) {
 			const row = rows[i];
 			// Skip short rows
-			if (!row || row.length < 14) continue;
+			if (!row || row.length <= Math.max(courseCol, meetingCol)) continue;
 
 			rowsProcessed++;
-			const courseName = row[1]; // Column B: "Course Listing"
-			const formatType = row[9]; // Column J: "Instructional Format"
-			const pattern = row[11]; // Column L: "Meeting Patterns"
+			const courseName = courseCol >= 0 ? row[courseCol] : undefined;
+			const formatType = formatCol >= 0 ? row[formatCol] : undefined;
+			const pattern = meetingCol >= 0 ? row[meetingCol] : undefined;
 
 			if (!courseName || !pattern) {
 				continue;
@@ -136,27 +204,31 @@ export async function processWorkdayFile(file: File): Promise<ProcessResult> {
 					if (cursor > mpEnd) continue; // No occurrence found
 
 					// Parse time for the first occurrence - try 24-hour format first
+					const normalizedStartTime = normalizeTimeString(String(startTimeStr));
+					const normalizedEndTime = normalizeTimeString(String(endTimeStr));
+					const hasAmPm = /\b(AM|PM)\b/.test(normalizedStartTime + ' ' + normalizedEndTime);
+
 					let startDT = DateTime.fromFormat(
-						`${cursor.toISODate()} ${startTimeStr}`,
-						'yyyy-MM-dd H:mm',
+						`${cursor.toISODate()} ${normalizedStartTime}`,
+						hasAmPm ? 'yyyy-MM-dd h:mm a' : 'yyyy-MM-dd H:mm',
 						{ zone: TIMEZONE }
 					);
 					let endDT = DateTime.fromFormat(
-						`${cursor.toISODate()} ${endTimeStr}`,
-						'yyyy-MM-dd H:mm',
+						`${cursor.toISODate()} ${normalizedEndTime}`,
+						hasAmPm ? 'yyyy-MM-dd h:mm a' : 'yyyy-MM-dd H:mm',
 						{ zone: TIMEZONE }
 					);
 
-					// If that fails, try 12-hour format with AM/PM
+					// If that fails, try the opposite time format as a fallback
 					if (!startDT.isValid || !endDT.isValid) {
 						startDT = DateTime.fromFormat(
-							`${cursor.toISODate()} ${startTimeStr}`,
-							'yyyy-MM-dd h:mm a',
+							`${cursor.toISODate()} ${normalizedStartTime}`,
+							hasAmPm ? 'yyyy-MM-dd H:mm' : 'yyyy-MM-dd h:mm a',
 							{ zone: TIMEZONE }
 						);
 						endDT = DateTime.fromFormat(
-							`${cursor.toISODate()} ${endTimeStr}`,
-							'yyyy-MM-dd h:mm a',
+							`${cursor.toISODate()} ${normalizedEndTime}`,
+							hasAmPm ? 'yyyy-MM-dd H:mm' : 'yyyy-MM-dd h:mm a',
 							{ zone: TIMEZONE }
 						);
 					}

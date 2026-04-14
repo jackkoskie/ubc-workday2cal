@@ -12,8 +12,8 @@ importers:
         specifier: ^10.0.0
         version: 10.1.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.1)(@types/node@24.12.2)(luxon@3.7.2)
       lucide-svelte:
-        specifier: ^0.577.0
-        version: 0.577.0(svelte@5.55.4(@typescript-eslint/types@8.58.2))
+        specifier: ^1.0.0
+        version: 1.0.1(svelte@5.55.4(@typescript-eslint/types@8.58.2))
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
@@ -1562,8 +1562,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lucide-svelte@0.577.0:
-    resolution: {integrity: sha512-0i88o57KsaHWnc80J57fY99CWzlZsSdtH5kKjLUJa7z8dum/9/AbINNLzJ7NiRFUdOgMnfAmJt8jFbW2zeC5qQ==}
+  lucide-svelte@1.0.1:
+    resolution: {integrity: sha512-WvzZgk0pqzgda+AErLvgWxHkfg/+GgUwqKMRHvzt0IqyMdmyEDzDCk3Z+Wo/3y753oIgx8u9Q4eUbWkghFa8Jg==}
     peerDependencies:
       svelte: ^3 || ^4 || ^5.0.0-next.42
 
@@ -3148,7 +3148,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lucide-svelte@0.577.0(svelte@5.55.4(@typescript-eslint/types@8.58.2)):
+  lucide-svelte@1.0.1(svelte@5.55.4(@typescript-eslint/types@8.58.2)):
     dependencies:
       svelte: 5.55.4(@typescript-eslint/types@8.58.2)
 

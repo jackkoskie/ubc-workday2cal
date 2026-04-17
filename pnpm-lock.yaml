@@ -10,7 +10,7 @@ importers:
     dependencies:
       ical-generator:
         specifier: ^10.0.0
-        version: 10.1.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.1)(@types/node@24.12.2)(luxon@3.7.2)
+        version: 10.2.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.1)(@types/node@24.12.2)(luxon@3.7.2)
       lucide-svelte:
         specifier: ^0.577.0
         version: 0.577.0(svelte@5.55.4(@typescript-eslint/types@8.58.2))
@@ -1380,8 +1380,8 @@ packages:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
     engines: {node: '>=8'}
 
-  ical-generator@10.1.0:
-    resolution: {integrity: sha512-VgWzox2svupw4HoZo9Ym0pmj50Cr7CO+By/TraNUVTXQL5Qh0p13iGNzizhXd/KDuzOHUSSXwUWIMZmBHQU65Q==}
+  ical-generator@10.2.0:
+    resolution: {integrity: sha512-XR5FsiDWCsz5MwBwMA/sQqR3A9H240xkXIeXOabV7uNAiieP+TA9rleVvlwPLRXMz+CXME8cGuDd7cdnE5At6w==}
     engines: {node: 20 || 22 || >=24}
     peerDependencies:
       '@touch4it/ical-timezones': '>=1.6.0'
@@ -3034,7 +3034,7 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  ical-generator@10.1.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.1)(@types/node@24.12.2)(luxon@3.7.2):
+  ical-generator@10.2.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.1)(@types/node@24.12.2)(luxon@3.7.2):
     optionalDependencies:
       '@touch4it/ical-timezones': 1.9.0
       '@types/luxon': 3.7.1

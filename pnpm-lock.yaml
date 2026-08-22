@@ -10,7 +10,7 @@ importers:
     dependencies:
       ical-generator:
         specifier: ^10.0.0
-        version: 10.2.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.4)(@types/node@24.13.3)(luxon@3.7.2)
+        version: 10.2.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.5)(@types/node@24.13.3)(luxon@3.7.2)
       lucide-svelte:
         specifier: ^1.0.0
         version: 1.0.1(svelte@5.56.10(@typescript-eslint/types@8.67.0))
@@ -47,7 +47,7 @@ importers:
         version: 4.3.3(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0))
       '@types/luxon':
         specifier: ^3.7.1
-        version: 3.7.4
+        version: 3.7.5
       '@types/node':
         specifier: ^24.0.0
         version: 24.13.3
@@ -853,8 +853,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/luxon@3.7.4':
-    resolution: {integrity: sha512-V536ZAd6ZJztrrBlLcDFaaZrXNAL2E5uGmssWf/dpSiLkmkLScXUYhUBnWPmtW+cIqnNHzf6//TCMpIc9SCRRQ==}
+  '@types/luxon@3.7.5':
+    resolution: {integrity: sha512-jJ41Q4z6ZVO260MNDdHfW7+7a5iMiX8Mr6ZJHcmgrvhZha6dz5704o/lF2kKl6URjH6ivEL97w9xS/MgpJEphg==}
 
   '@types/node@24.13.3':
     resolution: {integrity: sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==}
@@ -2448,7 +2448,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/luxon@3.7.4': {}
+  '@types/luxon@3.7.5': {}
 
   '@types/node@24.13.3':
     dependencies:
@@ -2828,10 +2828,10 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  ical-generator@10.2.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.4)(@types/node@24.13.3)(luxon@3.7.2):
+  ical-generator@10.2.0(@touch4it/ical-timezones@1.9.0)(@types/luxon@3.7.5)(@types/node@24.13.3)(luxon@3.7.2):
     optionalDependencies:
       '@touch4it/ical-timezones': 1.9.0
-      '@types/luxon': 3.7.4
+      '@types/luxon': 3.7.5
       '@types/node': 24.13.3
       luxon: 3.7.2
 
